@@ -82,9 +82,9 @@ void ShortestPath_FLOYD(struct Graph g){
         for(w=0;w<g.vertnum;w++){
             D[v][w] = g.edgs[v][w];
             for(u=0;u<g.vertnum;u++){
-                p[v][w][u]=False;
+                p[v][w][u]=False;//初始化三维数组
             }
-            if(D[v][w]<MAXDISTANCE){
+            if(D[v][w]<MAXDISTANCE){//从v到w有直接路径 说明v顶点肯定能到达w顶点，那么w和v一定是v到w顶点路径上的顶点
                 p[v][w][v]=True;
                 p[v][w][w]=True;
             }
@@ -93,7 +93,7 @@ void ShortestPath_FLOYD(struct Graph g){
     for(u=0;u<g.vertnum;u++){
         for(v=0;v<g.vertnum;v++){
             for(w=0;w<g.vertnum;w++){
-                if(D[v][u]+D[u][w]<D[v][w]){
+                if(D[v][u]+D[u][w]<D[v][w]){//从v经u到w的一条路径更短
                     D[v][w]=D[v][u]+D[u][w];
                     for(i=0;i<g.vertnum;i++){
                         p[v][w][i]=p[v][u][i];
