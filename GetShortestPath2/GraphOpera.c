@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #define MAXDISTANCE 9999//假如两个顶点没有 直接 的路径，它们之间的权值就用这个来表示
 
+/*
+  选用邻接矩阵存储图的关系，i和j两个顶点间如没有直接路径，那么arcs[i][j]=9999
+ */
 struct Graph init(void){
     struct Graph g;
     int i,j,k1,k2,weight;
@@ -80,7 +83,11 @@ void ShortestPath_FLOYD(struct Graph g){
     int i,v,w,u;
     for(v=0;v<g.vertnum;v++){//初始化D[v][w] 和p[v][w][u]
         for(w=0;w<g.vertnum;w++){
-            D[v][w] = g.edgs[v][w];
+            if(w==v){
+                D[w][v]=0;
+            }else{
+                D[v][w] = g.edgs[v][w];
+            }
             for(u=0;u<g.vertnum;u++){
                 p[v][w][u]=False;//初始化三维数组
             }
@@ -96,19 +103,33 @@ void ShortestPath_FLOYD(struct Graph g){
                 if(D[v][u]+D[u][w]<D[v][w]){//从v经u到w的一条路径更短
                     D[v][w]=D[v][u]+D[u][w];
                     for(i=0;i<g.vertnum;i++){
-                        p[v][w][i]=p[v][u][i];
+                        if(p[v][u][i] || p[u][w][i]){//把v到u和u到w的路径上的顶点就置为True
+                            p[v][w][i]=True;
+                        }
                     }
                 }
             }
         }
     }
-    
+    //打印出每一对顶点间的最短路径
     for(v=0;v<g.vertnum;v++){
         for(w=0;w<g.vertnum;w++){
             if(w==v){
                 continue;
             }
-            printf("%c和%c之间的最短距离为:%d\n",g.verts[v],g.verts[w],D[v][w]);
+            if(D[v][w]<MAXDISTANCE && D[v][w]>0){
+                printf("%c",g.verts[v]);
+                for(i=0;i<g.vertnum;i++){
+                    if(i==v || i==w){
+                        continue;
+                    }
+                    if(p[v][w][i]){
+                       printf("->%c",g.verts[i]);
+                    }
+                }
+                printf("->%c\t",g.verts[w]);
+                printf("最短距离为:%d\n",D[v][w]);
+            }
         }
     }
 }
